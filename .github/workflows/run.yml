@@ -42,3 +42,4 @@ jobs:
           git add prices.db || true
           git commit -m "auto: update price artifacts [skip ci]" || echo "No changes to commit"
           git push || echo "Push skipped (no changes or permission issue)"
+    
