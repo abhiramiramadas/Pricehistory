@@ -1,15 +1,18 @@
-name: Price Check
+name: Price Check (full)
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */6 * * *"    # every 6 hours
   workflow_dispatch:
 
 jobs:
   run_price_checker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -18,10 +21,24 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 lxml
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 lxml matplotlib
 
-      - name: Run tracker
+      - name: Run price tracker
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python price_tracker.py
+        run: |
+          python price_tracker_full.py
+
+      - name: Commit artifacts (prices.csv, prices.db, graphs/)
+        run: |
+          git config user.email "actions@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add prices.csv prices.db graphs || true
+          if ! git diff --staged --quiet; then
+            git commit -m "auto: update price artifacts [skip ci]" || true
+            git push
+          else
+            echo "No artifact changes"
+          fi
