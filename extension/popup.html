@@ -1,0 +1,21 @@
+<!doctype html><html><body>
+<h3>PriceWatcher</h3>
+<div id="list">Loading...</div>
+<script>
+const RAW_CSV_URL = "https://raw.githubusercontent.com/your-username/Pricehistory/main/prices.csv";
+async function load(){
+  try{
+    const r = await fetch(RAW_CSV_URL);
+    const txt = await r.text();
+    const lines = txt.trim().split('\\n').slice(1);
+    const map = {};
+    lines.forEach(l => {
+      const [url,site,name,price,checked_at] = l.split(',');
+      map[url] = {name,price,checked_at};
+    });
+    const html = Object.keys(map).map(u => `<div><b>${map[u].name}</b><br/>₹${map[u].price} <a href="${u}" target="_blank">open</a></div><hr/>`).join('');
+    document.getElementById('list').innerHTML = html || 'No data';
+  }catch(e){ document.getElementById('list').innerText='Error loading'; }
+}
+load();
+</script></body></html>

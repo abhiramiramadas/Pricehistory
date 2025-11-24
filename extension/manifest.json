@@ -1,0 +1,8 @@
+{
+  "manifest_version": 3,
+  "name": "PriceWatcher (Tara)",
+  "version": "0.1",
+  "description": "Show tracked product prices (reads repo CSV).",
+  "permissions": ["storage"],
+  "action": { "default_popup": "popup.html" }
+}
