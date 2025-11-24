@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Price Tracker Dashboard</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:24px}
+    table{border-collapse:collapse;width:100%}
+    th,td{border:1px solid #ddd;padding:8px;text-align:left}
+  </style>
+</head>
+<body>
+  <h1>Price Tracker Dashboard</h1>
+  <p>Shows latest price per product.</p>
+  <table id="tbl"><thead><tr><th>Product</th><th>Price</th><th>Last checked</th><th>Graph</th></tr></thead><tbody></tbody></table>
+  <script>
+    const RAW_CSV_URL = "https://raw.githubusercontent.com/your-username/Pricehistory/main/prices.csv";
+    async function load() {
+      try {
+        const r = await fetch(RAW_CSV_URL);
+        if(!r.ok){ document.body.insertAdjacentHTML('beforeend','<p>CSV not found yet.</p>'); return; }
+        const txt = await r.text();
+        const lines = txt.trim().split('\\n').slice(1);
+        // get last entry per URL
+        const map = {};
+        for(const line of lines){
+          const [url,site,name,price,checked_at] = line.split(',');
+          map[url] = {name, price, checked_at};
+        }
+        const tbody = document.querySelector('#tbl tbody');
+        for(const u in map){
+          const item = map[u];
+          const gname = 'graphs/' + u.replace(/[^0-9a-zA-Z]+/g,'_').slice(0,80) + '.png';
+          tbody.insertAdjacentHTML('beforeend', `<tr><td><a href="${u}" target="_blank">${item.name}</a></td><td>₹${item.price}</td><td>${item.checked_at}</td><td><a href="${gname}" target="_blank">graph</a></td></tr>`);
+        }
+      } catch(e){ console.error(e); document.body.insertAdjacentHTML('beforeend','<p>Error loading CSV</p>'); }
+    }
+    load();
+  </script>
+</body>
+</html>
