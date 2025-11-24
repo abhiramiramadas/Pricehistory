@@ -1,44 +1,62 @@
-name: Price Check (full)
+name: Price Check
 
 on:
   schedule:
-    - cron: "0 */6 * * *"    # every 6 hours
-  workflow_dispatch:
+    - cron: "0 */6 * * *"   # runs every 6 hours
+  workflow_dispatch:        # allow manual run
 
 jobs:
   run_price_checker:
     runs-on: ubuntu-latest
+
     steps:
+      # -------------------------
+      # CHECKOUT WITH PERMISSIONS
+      # -------------------------
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          fetch-depth: 0
+          persist-credentials: true     # allows pushing back to repo
 
+      # -------------------------
+      # SET UP PYTHON
+      # -------------------------
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
+      # -------------------------
+      # INSTALL DEPENDENCIES
+      # -------------------------
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 lxml matplotlib
+          pip install requests beautifulsoup4 lxml matplotlib pandas
 
-      - name: Run price tracker
+      # -------------------------
+      # RUN PRICE TRACKER
+      # -------------------------
+      - name: Run tracker
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
           python price_tracker.py
 
-      - name: Commit artifacts (prices.csv, prices.db, graphs/)
+      # -------------------------
+      # PUSH UPDATED FILES (graphs, csv, db)
+      # -------------------------
+      - name: Commit & push artifacts
         run: |
           git config user.email "actions@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git add prices.csv prices.db graphs || true
-          if ! git diff --staged --quiet; then
-            git commit -m "auto: update price artifacts [skip ci]" || true
-            git push
-          else
-            echo "No artifact changes"
-          fi
+          git config user.name "github-actions"
+          
+          # Add any updated/generated files
+          git add graphs/*.png || true
+          git add prices.csv || true
+          git add prices.db || true
+
+          # Commit only if there are changes
+          git commit -m "auto: update price artifacts [skip ci]" || echo "No changes to commit"
+          git push || echo "Push skipped (no changes or permission issue)"
