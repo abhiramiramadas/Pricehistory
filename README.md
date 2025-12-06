@@ -120,10 +120,11 @@ Idc.
 
 ---
 
-## ⭐ Give star pls
+## ⭐
 
 I’m not saying your crush will text you after you star the repo…
 …but I’m also **not not** saying it.
 
 ---
+
 
