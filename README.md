@@ -110,6 +110,14 @@ Teach it to trade crypto.
 Idc.
 
 ---
+## 👩‍💻 Author
+
+**Abhirami Ramadas**
+
+B.Tech Information Technology
+
+LBS Institute of Technology for Women
+---
 
 ## ⚠️ Disclaimer
 
@@ -126,5 +134,6 @@ I’m not saying your crush will text you after you star the repo…
 …but I’m also **not not** saying it.
 
 ---
+
 
 
